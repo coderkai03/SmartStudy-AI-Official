@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "361716777056",
+    "project_id": "smartstudy-ai",
+    "storage_bucket": "smartstudy-ai.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361716777056:android:3c368f9ad71898b2620305",
+        "android_client_info": {
+          "package_name": "com.example.ai_flashcards"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvGkxavJ0VUqvy0WBhy6NSwtiJdUYNNiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
