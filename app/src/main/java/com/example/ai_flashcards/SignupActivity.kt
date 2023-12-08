@@ -71,7 +71,7 @@ class SignupActivity : AppCompatActivity() {
                             "Account created.",
                             Toast.LENGTH_SHORT,
                         ).show()
-                        val intent = Intent(this, BuildByTopicActivity::class.java)
+                        val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
                         finish()
                     } else {

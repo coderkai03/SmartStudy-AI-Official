@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,6 +16,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var question1: TextView
     // Add button Move to Activity
     private lateinit var build_screen: Button
+
+    private lateinit var logout_btn: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         //set screen button
         build_screen = findViewById<Button>(R.id.start_learning)
-
+        logout_btn = findViewById(R.id.logout_btn)
 
         // Add_button add clicklistener
         build_screen.setOnClickListener {
@@ -36,6 +39,14 @@ class MainActivity : AppCompatActivity() {
             Log.d("Home", "cleared prefs: "+sharedPref.all.toString())
 
             startActivity(intent)
+        }
+
+        //logout user
+        logout_btn.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(this, SignupActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 }
