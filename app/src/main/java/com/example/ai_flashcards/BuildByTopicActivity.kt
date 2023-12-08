@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.DataOutputStream
@@ -21,11 +23,11 @@ import java.net.URL
 import java.util.concurrent.CountDownLatch
 
 class BuildByTopicActivity : AppCompatActivity() {
-    private val openaiApiKey = "YOUR API KEY HERE"
+    private val openaiApiKey = "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"
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var inputTopic: EditText
     private lateinit var loading: TextView
-
+    lateinit var topicCV: CardView
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +44,7 @@ class BuildByTopicActivity : AppCompatActivity() {
 
         term_screen = findViewById(R.id.by_term)
         study_screen = findViewById(R.id.buildByTopic)
+        topicCV = findViewById(R.id.topic_buttonCV)
 
         loading = findViewById(R.id.loading_topic)
         loading.visibility = View.INVISIBLE
@@ -55,9 +58,13 @@ class BuildByTopicActivity : AppCompatActivity() {
 
         // Add_button add clicklistener
         study_screen.setOnClickListener {
-
             loading.visibility = View.VISIBLE
 
+            val disable = getColor(R.color.disabledClay)
+            val colorStateList = ColorStateList.valueOf(disable)
+            study_screen.isEnabled = false
+            study_screen.backgroundTintList = colorStateList
+            topicCV.backgroundTintList = colorStateList
 
             val intent = Intent(this, StudyActivity::class.java)
             val apiTask = ApiTask(object : OnApiDataReceivedListener {

@@ -3,6 +3,7 @@ package com.example.ai_flashcards
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -11,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.AsyncTask
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
+import androidx.cardview.widget.CardView
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.DataOutputStream
@@ -25,10 +28,11 @@ interface OnApiDataReceivedListener {
 
 
 class BuildByTerm : AppCompatActivity() {
-    private val openaiApiKey = "YOUR API KEY HERE"
+    private val openaiApiKey = "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"
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var inputTerm: EditText
     private lateinit var loading: TextView
+    lateinit var termCV: CardView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +53,7 @@ class BuildByTerm : AppCompatActivity() {
         //assign buttons
         topic_screen = findViewById(R.id.topic_button)
         study_screen = findViewById(R.id.buildByTerm)
+        termCV = findViewById(R.id.term_buttonCV)
 
         // Add_button add clicklistener
         topic_screen.setOnClickListener {
@@ -59,6 +64,13 @@ class BuildByTerm : AppCompatActivity() {
 
         study_screen.setOnClickListener {
             loading.visibility = View.VISIBLE
+
+            val disable = getColor(R.color.disabledClay)
+            val colorStateList = ColorStateList.valueOf(disable)
+            study_screen.isEnabled = false
+            study_screen.backgroundTintList = colorStateList
+            termCV.backgroundTintList = colorStateList
+
 
             val intent = Intent(this, StudyActivity::class.java)
             val apiTask = ApiTask(object : OnApiDataReceivedListener {
