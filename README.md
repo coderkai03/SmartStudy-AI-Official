@@ -1,16 +1,4 @@
-# AND101 Milestone 1 - AI-Flashcards
-
-Submitted by:
-- Rian Corcino
-- Rowan Osmon
-- Andrew Solbjor
-- Cody Kneale
-- Erik Perez
-- Enrique Vargas
-
-Time spent: 70 hours spent in total
-
-## Summary
+## SmartStudy AI: Summary
 
 This document provides an overview, project spec, and wireframes for our team's capstone project: An app that allows you to enter key terms for various study subjects and uses an AI to write the most appropriate definition for the terms. It will allow for a more robust and adaptable studying experience, not having the limitations of focusing on one particular topic over another. 
 
