@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import com.google.firebase.auth.FirebaseAuth
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.DataOutputStream
@@ -28,6 +29,11 @@ class BuildByTopicActivity : AppCompatActivity() {
     private lateinit var inputTopic: EditText
     private lateinit var loading: TextView
     lateinit var topicCV: CardView
+    lateinit var term_screen: Button
+    lateinit var study_screen: Button
+    lateinit var uname_text: TextView
+
+    lateinit var auth: FirebaseAuth
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,14 +43,14 @@ class BuildByTopicActivity : AppCompatActivity() {
         //sharedPreferences
         sharedPrefs = this.getSharedPreferences(this.packageName, Context.MODE_PRIVATE)
 
-        val term_screen: Button
-        val study_screen: Button
-
         inputTopic = findViewById<EditText>(R.id.input_topic)
-
+        uname_text = findViewById(R.id.uname)
         term_screen = findViewById(R.id.by_term)
         study_screen = findViewById(R.id.buildByTopic)
         topicCV = findViewById(R.id.topic_buttonCV)
+
+        auth = FirebaseAuth.getInstance()
+        uname_text.setText(auth.currentUser?.email)
 
         loading = findViewById(R.id.loading_topic)
         loading.visibility = View.INVISIBLE
@@ -137,8 +143,6 @@ class BuildByTopicActivity : AppCompatActivity() {
 
         return resultList
     }
-
-
 
 
     private inner class ApiTask(private val onDataReceivedListener: OnApiDataReceivedListener) : AsyncTask<Void, Void, String>() {
