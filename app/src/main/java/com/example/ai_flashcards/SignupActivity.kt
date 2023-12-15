@@ -76,34 +76,46 @@ class SignupActivity : AppCompatActivity() {
                 Toast.makeText(this, "Enter username", Toast.LENGTH_SHORT).show()
             }
 
+            // create new user auth
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         // If sign in succeeds, display a message to the user.
+                        Log.e(
+                            "Registration",
+                            "Authentication success"
+                        )
                         Toast.makeText(
                             baseContext,
                             "Account created.",
                             Toast.LENGTH_SHORT,
                         ).show()
 
+                        // create new firestore document for user
                         val user = hashMapOf(
                             "email" to email,
                             "username" to uname,
                             "password" to password
                         )
 
-                        fs.collection("users")
-                            .add(user)
-                            .addOnSuccessListener { docRef ->
-                                Log.d("SIGNUP", "DocSnapshot added with ID: ${docRef}")
-                            }
-                            .addOnFailureListener{ e ->
-                                Log.d("SIGNUP", "Error adding doc", e)
-                            }
+                        val currUser = auth.currentUser
+                        if (currUser != null) {
+                            val currID = currUser.uid
 
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
-                        finish()
+                            fs.collection("users")
+                                .document(currID)
+                                .set(user)
+                                .addOnSuccessListener { docRef ->
+                                    Log.d("SIGNUP", "DocSnapshot added with ID: ${docRef}")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.d("SIGNUP", "Error adding doc", e)
+                                }
+
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.e(

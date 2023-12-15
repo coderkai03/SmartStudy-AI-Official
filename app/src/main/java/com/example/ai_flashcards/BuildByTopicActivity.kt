@@ -14,7 +14,10 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.DataOutputStream
@@ -34,11 +37,14 @@ class BuildByTopicActivity : AppCompatActivity() {
     lateinit var uname_text: TextView
 
     lateinit var auth: FirebaseAuth
+    lateinit var fs: FirebaseFirestore
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_build_by_topic)
+
+        fs = Firebase.firestore
 
         //sharedPreferences
         sharedPrefs = this.getSharedPreferences(this.packageName, Context.MODE_PRIVATE)
@@ -50,7 +56,32 @@ class BuildByTopicActivity : AppCompatActivity() {
         topicCV = findViewById(R.id.topic_buttonCV)
 
         auth = FirebaseAuth.getInstance()
-        uname_text.setText(auth.currentUser?.email)
+
+        val currUser = auth.currentUser // fix user ID, wrong id?
+        if (currUser != null){
+            val currUid = currUser.uid
+            fs.collection("users")
+                .document(currUid)
+                .get()
+                .addOnSuccessListener { document ->
+//                    Log.d("SEARCH USER", "${document.id} => ${currUid}")
+                    Log.d("USER", "${document.id} => ${document.getString("username")}")
+                    if (document.exists()) {
+                        val name = document.getString("username")
+                        uname_text.setText(name)
+                        Log.d("USER", "${document.id} => ${name}")
+                    }
+                    else {
+                        Log.d("USER", "doesnt exist")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.w("USER", "Error getting documents.", exception)
+                }
+        }
+
+
+        //uname_text.setText(auth.currentUser?.email)
 
         loading = findViewById(R.id.loading_topic)
         loading.visibility = View.INVISIBLE

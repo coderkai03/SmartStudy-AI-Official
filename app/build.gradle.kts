@@ -55,7 +55,7 @@ dependencies {
     // Use consistent Firebase versions
 //    implementation("com.google.firebase:firebase-core:23.0.3")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
-    implementation("com.google.firebase:firebase-firestore:24.10.0") // Use only the ktx version
+    implementation("com.google.firebase:firebase-firestore:24.10.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
