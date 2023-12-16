@@ -14,6 +14,10 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.DataOutputStream
@@ -33,6 +37,12 @@ class BuildByTerm : AppCompatActivity() {
     private lateinit var inputTerm: EditText
     private lateinit var loading: TextView
     lateinit var termCV: CardView
+    lateinit var uname_text: TextView
+
+    //firebase
+    lateinit var auth: FirebaseAuth
+    lateinit var fs: FirebaseFirestore
+    lateinit var currID: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +50,6 @@ class BuildByTerm : AppCompatActivity() {
 
         loading = findViewById(R.id.loading_term)
         loading.visibility = View.INVISIBLE
-
-        //sharedPreferences
-        sharedPrefs = this.getSharedPreferences(this.packageName, Context.MODE_PRIVATE)
 
         //buttons
         val topic_screen: Button
@@ -54,6 +61,35 @@ class BuildByTerm : AppCompatActivity() {
         topic_screen = findViewById(R.id.topic_button)
         study_screen = findViewById(R.id.buildByTerm)
         termCV = findViewById(R.id.term_buttonCV)
+        uname_text = findViewById(R.id.uname)
+
+        fs = Firebase.firestore
+        auth = FirebaseAuth.getInstance()
+
+        //get & display username
+        val currUser = auth.currentUser
+        if (currUser != null) {
+            currID = currUser.uid
+
+
+            fs.collection("users")
+                .document(currID)
+                .get()
+                .addOnSuccessListener { document ->
+//                    Log.d("SEARCH USER", "${document.id} => ${currUid}")
+                    Log.d("USER", "${document.id} => ${document.getString("username")}")
+                    if (document.exists()) {
+                        val name = document.getString("username")
+                        uname_text.setText(name)
+                        Log.d("USER", "${document.id} => ${name}")
+                    } else {
+                        Log.d("USER", "doesnt exist")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.w("USER", "Error getting documents.", exception)
+                }
+        }
 
         // Add_button add clicklistener
         topic_screen.setOnClickListener {
@@ -78,21 +114,16 @@ class BuildByTerm : AppCompatActivity() {
                     // This callback is triggered when JSON data is received
                     Log.d("ByTerm", "Received API data: $data")
 
-                    // Process the data or update shared preferences as needed
-                    val spsize = sharedPrefs.all.size
-                    val cardIndex = if (sharedPrefs.contains("input_topic")) spsize else spsize + 1
-
-                    val content = parseJsonResponse(data)
-
-                    with(sharedPrefs.edit()) {
-                        putString("card$cardIndex", inputTerm.text.toString() + "|" + content)
-                        apply()
+                    //add flashcard to firestore
+                    val content = hashMapOf(
+                        inputTerm.text.toString() to parseJsonResponse(data)
+                    )
+                    if (currID != null) {
+                        val userDoc = fs.collection("users")
+                            .document(currID)
+                            .collection("Flashcards")
+                            .add(content)
                     }
-
-                    val spterm = sharedPrefs.getString("card$cardIndex", "not found")
-                    val term = if (spterm == null) "not found" else spterm
-                    Log.d("ByTerm", "SHAREDPREFS: ${sharedPrefs.all}")
-
 
                     Log.d("ByTerm","Building...")
 

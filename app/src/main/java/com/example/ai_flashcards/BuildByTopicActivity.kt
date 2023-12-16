@@ -47,17 +47,13 @@ class BuildByTopicActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_build_by_topic)
 
-        fs = Firebase.firestore
-
-        //sharedPreferences
-        sharedPrefs = this.getSharedPreferences(this.packageName, Context.MODE_PRIVATE)
-
         inputTopic = findViewById<EditText>(R.id.input_topic)
         uname_text = findViewById(R.id.uname)
         term_screen = findViewById(R.id.by_term)
         study_screen = findViewById(R.id.buildByTopic)
         topicCV = findViewById(R.id.topic_buttonCV)
 
+        fs = Firebase.firestore
         auth = FirebaseAuth.getInstance()
 
         //get & display username
@@ -113,22 +109,7 @@ class BuildByTopicActivity : AppCompatActivity() {
                     // This callback is triggered when JSON data is received
                     Log.d("ByTopic", "Received API data: $data")
 
-//                    // Process the data or update shared preferences as needed
-//                    val spsize = sharedPrefs.all.size
-//                    var cardIndex = if (sharedPrefs.contains("input_topic")) spsize else spsize + 1
-//
-//                    val content = parseJsonResponse(data)
-//
-//                    with(sharedPrefs.edit()) {
-//                        for (i in 0 until content.size){
-//                            putString("card$cardIndex", content[i])
-//                            cardIndex+=1
-//                        }
-//                        apply()
-//                    }
-
-//                    val flashcardMap
-
+                    //add flashcards to firestore
                     val content = parseJsonResponse(data) //flashcard map <term, def>
                     if (currUid != null) {
                         val userDoc = fs.collection("users").document(currUid)
@@ -145,8 +126,6 @@ class BuildByTopicActivity : AppCompatActivity() {
                                 Log.d("BBTOPIC", "Card failed add: ${e}")
                             }
                     }
-
-                    Log.d("ByTopic", "SHAREDPREFS: ${sharedPrefs.all}")
 
                     // start the activity connect to the specified class
                     startActivity(intent)
