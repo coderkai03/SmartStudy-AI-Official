@@ -102,6 +102,7 @@ class SignupActivity : AppCompatActivity() {
                         if (currUser != null) {
                             val currID = currUser.uid
 
+                            //create user document
                             fs.collection("users")
                                 .document(currID)
                                 .set(user)
@@ -111,6 +112,13 @@ class SignupActivity : AppCompatActivity() {
                                 .addOnFailureListener { e ->
                                     Log.d("SIGNUP", "Error adding doc", e)
                                 }
+
+                            //create empty flashcard document
+                            fs.collection("users")
+                                .document(currID)
+                                .collection("Flashcards")
+                                .document("AllCards")
+                                .set(emptyMap<String, Any>()) //empty card map
 
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)

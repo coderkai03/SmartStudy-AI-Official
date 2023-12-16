@@ -118,7 +118,8 @@ class BuildByTopicActivity : AppCompatActivity() {
                         fs.collection("users")
                             .document(currUid)
                             .collection("Flashcards")
-                            .add(content)
+                            .document("AllCards")
+                            .update(content)
                             .addOnSuccessListener { doc ->
                                 Log.d("BBTOPIC", "Card added: ${doc}")
                             }
@@ -138,8 +139,8 @@ class BuildByTopicActivity : AppCompatActivity() {
         }
     }
 
-    private fun parseJsonResponse(data: String): HashMap<String, String> {
-        var resultList: HashMap<String, String> = hashMapOf()
+    private fun parseJsonResponse(data: String): HashMap<String, Any> {
+        var resultList: HashMap<String, Any> = hashMapOf()
 
         try {
             val jsonObject = JSONObject(data)

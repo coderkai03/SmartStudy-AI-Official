@@ -122,7 +122,17 @@ class BuildByTerm : AppCompatActivity() {
                         val userDoc = fs.collection("users")
                             .document(currID)
                             .collection("Flashcards")
-                            .add(content)
+                            .document("AllCards")
+                            .update(
+                                inputTerm.text.toString(),
+                                parseJsonResponse(data)
+                            )
+                            .addOnSuccessListener { doc ->
+                                Log.d("BBTERM", "Card added: ${doc}")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.d("BBTERM", "Card failed add: ${e}")
+                            }
                     }
 
                     Log.d("ByTerm","Building...")
