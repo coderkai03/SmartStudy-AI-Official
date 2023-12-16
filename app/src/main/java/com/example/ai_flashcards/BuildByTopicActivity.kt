@@ -16,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import org.json.JSONObject
@@ -38,6 +40,7 @@ class BuildByTopicActivity : AppCompatActivity() {
 
     lateinit var auth: FirebaseAuth
     lateinit var fs: FirebaseFirestore
+    lateinit var currUid: String
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,9 +60,12 @@ class BuildByTopicActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        val currUser = auth.currentUser // fix user ID, wrong id?
-        if (currUser != null){
-            val currUid = currUser.uid
+        //get & display username
+        val currUser = auth.currentUser
+        if (currUser != null) {
+            currUid = currUser.uid
+
+
             fs.collection("users")
                 .document(currUid)
                 .get()
@@ -70,8 +76,7 @@ class BuildByTopicActivity : AppCompatActivity() {
                         val name = document.getString("username")
                         uname_text.setText(name)
                         Log.d("USER", "${document.id} => ${name}")
-                    }
-                    else {
+                    } else {
                         Log.d("USER", "doesnt exist")
                     }
                 }
@@ -81,8 +86,7 @@ class BuildByTopicActivity : AppCompatActivity() {
         }
 
 
-        //uname_text.setText(auth.currentUser?.email)
-
+        //loading text
         loading = findViewById(R.id.loading_topic)
         loading.visibility = View.INVISIBLE
 
@@ -109,26 +113,40 @@ class BuildByTopicActivity : AppCompatActivity() {
                     // This callback is triggered when JSON data is received
                     Log.d("ByTopic", "Received API data: $data")
 
-                    // Process the data or update shared preferences as needed
-                    val spsize = sharedPrefs.all.size
-                    var cardIndex = if (sharedPrefs.contains("input_topic")) spsize else spsize + 1
+//                    // Process the data or update shared preferences as needed
+//                    val spsize = sharedPrefs.all.size
+//                    var cardIndex = if (sharedPrefs.contains("input_topic")) spsize else spsize + 1
+//
+//                    val content = parseJsonResponse(data)
+//
+//                    with(sharedPrefs.edit()) {
+//                        for (i in 0 until content.size){
+//                            putString("card$cardIndex", content[i])
+//                            cardIndex+=1
+//                        }
+//                        apply()
+//                    }
 
-                    val content = parseJsonResponse(data)
+//                    val flashcardMap
 
-                    with(sharedPrefs.edit()) {
-                        for (i in 0 until content.size){
-                            putString("card$cardIndex", content[i])
-                            cardIndex+=1
-                        }
-                        apply()
+                    val content = parseJsonResponse(data) //flashcard map <term, def>
+                    if (currUid != null) {
+                        val userDoc = fs.collection("users").document(currUid)
+                        val flashcardDoc = userDoc.collection("Flashcards")
+
+                        fs.collection("users")
+                            .document(currUid)
+                            .collection("Flashcards")
+                            .add(content)
+                            .addOnSuccessListener { doc ->
+                                Log.d("BBTOPIC", "Card added: ${doc}")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.d("BBTOPIC", "Card failed add: ${e}")
+                            }
                     }
 
-                    val spterm = sharedPrefs.getString("card$cardIndex", "not found")
-                    val term = if (spterm == null) "not found" else spterm
                     Log.d("ByTopic", "SHAREDPREFS: ${sharedPrefs.all}")
-
-
-                    Log.d("ByTopic","Building...")
 
                     // start the activity connect to the specified class
                     startActivity(intent)
@@ -141,8 +159,8 @@ class BuildByTopicActivity : AppCompatActivity() {
         }
     }
 
-    private fun parseJsonResponse(data: String): List<String> {
-        val resultList = mutableListOf<String>()
+    private fun parseJsonResponse(data: String): HashMap<String, String> {
+        var resultList: HashMap<String, String> = hashMapOf()
 
         try {
             val jsonObject = JSONObject(data)
@@ -161,7 +179,7 @@ class BuildByTopicActivity : AppCompatActivity() {
                 for (line in lines) {
                     if (term != null) {
                         val definition = line.trim()
-                        resultList.add("$term|$definition")
+                        resultList[term] = definition
                         term = null
                     } else {
                         term = line.trim()
