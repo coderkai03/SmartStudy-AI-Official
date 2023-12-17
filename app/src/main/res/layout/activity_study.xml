@@ -8,6 +8,18 @@
     android:background="@color/BackgroundBlue">
 
     <TextView
+        android:id="@+id/uname"
+        android:text=""
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"/>
+
+    <TextView
         android:id="@+id/study_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

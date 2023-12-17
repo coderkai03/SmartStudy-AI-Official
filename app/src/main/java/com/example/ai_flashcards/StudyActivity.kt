@@ -8,10 +8,16 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import kotlin.math.log
 import kotlin.random.Random
 
@@ -21,8 +27,15 @@ class StudyActivity : AppCompatActivity() {
     lateinit var rv_flashcards: RecyclerView
     val flashcardList = mutableListOf<Flashcard>()
 
+    //xml
+    lateinit var uname_text: TextView
+
     //shared prefs
-    private lateinit var sharedPrefs: SharedPreferences
+    private lateinit var sharedPrefs: SharedPreferences //delete
+
+    //firebase
+    lateinit var auth: FirebaseAuth
+    lateinit var fs: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,12 +58,32 @@ class StudyActivity : AppCompatActivity() {
         val home = findViewById<Button>(R.id.home)
         val reset = findViewById<Button>(R.id.reset)
         val resetCV = findViewById<CardView>(R.id.reset_cv)
+        uname_text = findViewById(R.id.uname)
 
         // Find background icons
         val shuffle_icon = resources.getDrawable(R.drawable.shuffle_icon)
         val edit_icon = resources.getDrawable(R.drawable.edit_icon)
         val add_icon = resources.getDrawable(R.drawable.add_icon)
         val home_icon = resources.getDrawable(R.drawable.home_icon)
+
+        //firebase setup
+        fs = Firebase.firestore
+        auth = FirebaseAuth.getInstance()
+        var currUser = auth.currentUser
+
+        //get username
+        if (currUser != null) {
+            val currID = currUser.uid
+            fs.collection("users")
+                .document(currID)
+                .get()
+                .addOnSuccessListener { doc ->
+                    if (doc.exists()) {
+                        val uname = doc.getString("username")
+                        uname_text.setText(uname)
+                    }
+                }
+        }
 
 
         // Set icons
@@ -105,14 +138,15 @@ class StudyActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
+    override fun onResume() { //is onResume necessary?
         super.onResume()
 
-        //
-        if (sharedPrefs.all.size != 0) {
-            Log.d("StudyActivity", "found existing cards")
-            loadFlashcards()
-        }
+//        if (sharedPrefs.all.size != 0) {
+//            Log.d("StudyActivity", "found existing cards")
+//            loadFlashcards()
+//        }
+
+
     }
 
     private fun setRVFlashcards() {
