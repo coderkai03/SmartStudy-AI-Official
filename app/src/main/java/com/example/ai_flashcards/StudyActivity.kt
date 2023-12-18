@@ -111,7 +111,19 @@ class StudyActivity : AppCompatActivity() {
             //delete Flashcards FirestoreS document
             fs.collection("users")
                 .document(uid)
-                .update(HashMap<String, Any>())
+                .collection("Flashcards")
+                .document("AllCards")
+                .delete()
+                .addOnSuccessListener{  doc ->
+                    Log.d("RESET", "Reset cards: ${doc.toString()}")
+
+                    //create empty flashcard document
+                    fs.collection("users")
+                        .document(uid)
+                        .collection("Flashcards")
+                        .document("AllCards")
+                        .set(emptyMap<String, Any>()) //empty card map
+                }
         }
     }
 
