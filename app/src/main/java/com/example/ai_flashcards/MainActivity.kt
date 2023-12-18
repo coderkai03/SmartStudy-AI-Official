@@ -32,11 +32,7 @@ class MainActivity : AppCompatActivity() {
 
         // Add_button add clicklistener
         build_screen.setOnClickListener {
-            val intent = Intent(this, BuildByTopicActivity::class.java)
-
-            // Clear all flashcard data from shared preferences
-            sharedPref.edit().clear().apply()
-            Log.d("Home", "cleared prefs: "+sharedPref.all.toString())
+            val intent = Intent(this, StudyActivity::class.java)
 
             startActivity(intent)
         }
